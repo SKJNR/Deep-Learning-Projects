@@ -7,6 +7,12 @@ Main aim of this project to know weather people's are afraiding of AI or they ar
 * For this project i had used an article published in [Newyork Times](https://www.nytimes.com/2019/10/31/opinion/superintelligent-artificial-intelligence.html) 
 * Text data has been processed by implementing different cleansing techniques in NLP.
 
+
+## Code and Resources Used :
+* Python Version : 3.7
+* Packages: pandas, numpy,NLTK,matplotlib
+
+
 ## Visualizations 
 ![](Images/12.png)
 # Sentiment Analysis on Before outbreak COVID and After Outbreak COVID
@@ -21,7 +27,20 @@ Main aim of this project to know weather people's are afraiding of AI or they ar
  * Text data has been processed by implementing different cleansing techniques in NLP.
 ## Code and Resources Used :
 * Python Version : 3.7
-* Packages: pandas, numpy,NLTK,matplotlib,
+* Packages: pandas, numpy,NLTK,matplotlib
+
 
 ## Visualizations 
 ![](Images/12.png)
+
+
+# References :
+
+https://www.nytimes.com/2018/01/25/opinion/artificial-intelligence-black-box.html  <br>
+
+https://www.mckinsey.com/business-functions/marketing-and-sales/our-insights/global-surveys-of-consumer-sentiment-during-the-coronavirus-crisis#  <br>
+
+https://towardsdatascience.com/how-to-scrape-tweets-from-twitter-59287e20f0f1 <br>
+
+
+
