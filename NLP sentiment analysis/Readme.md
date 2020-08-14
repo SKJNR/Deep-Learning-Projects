@@ -1,5 +1,8 @@
 # Analysing Sentiment's about Should we afraid of AI
+
 [Analysing Sentiment's about Should we afraid of AI](https://github.com/Surekha-honey/Deep-Learning-Projects/blob/master/NLP%20sentiment%20analysis/Analysing%20Sentiment's%20about%20Should%20we%20afraid%20of%20AI.ipynb)
+
+
  ![](Images/13.jpg)
 
 Main aim of this project to know weather people's are afraiding of AI or they are looking for alternatives or any other with text .
