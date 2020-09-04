@@ -42,7 +42,7 @@ Programming Language :Python Version : 3.7  <br>
    ### Observations
 * From here we can observe one thing most of the customers who gave feedback they mostly used Desktop compare Mobile and Tablet .
 
-## [Data Cleansing and Training Model](https://github.com/Surekha-honey/Deep-Learning-Projects/blob/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Restraunt%20Customers%20%20Review%20Analysis%20Weather%20it's%20Positive%20or%20Negative.ipynb)
+## [Data Cleansing and Training Model]
    * This steps plays an key role while training model 
    * For Cleansing data on text data best methods are regular expressions,Lambda functions , Stop words removal and some other techniques .
    * To train model we have to follow some steps:
@@ -50,6 +50,7 @@ Programming Language :Python Version : 3.7  <br>
        * applying algorithms 
        * Selecting Best algorithm based on error and accuracy 
        * Finally tuning model 
+       * Check it out complete project [here](https://github.com/Surekha-honey/Deep-Learning-Projects/blob/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Restraunt%20Customers%20%20Review%20Analysis%20Weather%20it's%20Positive%20or%20Negative.ipynb)
        
 
 
