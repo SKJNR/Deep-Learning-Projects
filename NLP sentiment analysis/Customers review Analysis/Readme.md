@@ -7,6 +7,7 @@
 * [Reading Dataset](#reading-dataset)
 * [Exploratory Data Analysis](#exploratory-data-analysis)
   * [Observations](#observations)
+* [Data Cleansing and Training Model](Data-Cleansing-and-Training-Model)
 * [Testing Model](#testing-model)
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -32,14 +33,26 @@ Programming Language :Python Version : 3.7  <br>
 
 ### Exploratory Data Analysis
 ![images](https://raw.githubusercontent.com/Surekha-honey/Deep-Learning-Projects/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Images/4.png)
-### Observations
+   ### Observations
 * Most of customers to give feedback they had been used Firefox 7367 peoples and Microsoft edge 7134 people's mostly used compare to all other browsers.
 * In very few peoples in the sense only 362 customers had been used operamini to give feedback .
 
 ![images](https://raw.githubusercontent.com/Surekha-honey/Deep-Learning-Projects/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Images/5.png)
 
-### Observations
+   ### Observations
 * From here we can observe one thing most of the customers who gave feedback they mostly used Desktop compare Mobile and Tablet .
+
+## [Data Cleansing and Training Model](https://github.com/Surekha-honey/Deep-Learning-Projects/blob/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Restraunt%20Customers%20%20Review%20Analysis%20Weather%20it's%20Positive%20or%20Negative.ipynb)
+   * This steps plays an key role while training model 
+   * For Cleansing data on text data best methods are regular expressions,Lambda functions , Stop words removal and some other techniques .
+   * To train model we have to follow some steps:
+       * Splitting dataset into training and testing
+       * applying algorithms 
+       * Selecting Best algorithm based on error and accuracy 
+       * Finally tuning model 
+       
+
+
 
 ## Testing Model
 
