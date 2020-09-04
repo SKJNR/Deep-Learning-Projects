@@ -43,7 +43,7 @@ Programming Language :Python Version : 3.7  <br>
    ### Observations
 * From here we can observe one thing most of the customers who gave feedback they mostly used Desktop compare Mobile and Tablet .
 
-## [Data Cleansing and Training Model]
+## Data Cleansing and Training Model
    * This steps plays an key role while training model 
    * For Cleansing data on text data best methods are regular expressions,Lambda functions , Stop words removal and some other techniques .
    * To train model we have to follow some steps:
