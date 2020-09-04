@@ -7,8 +7,7 @@
 * [Reading Dataset](#reading-dataset)
 * [Exploratory Data Analysis](#exploratory-data-analysis)
   * [Observations](#observations)
-* [Contact](#contact)
-* [Acknowledgements](#acknowledgements)
+* [Testing Model](#testing-model)
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 ![images](https://raw.githubusercontent.com/Surekha-honey/Deep-Learning-Projects/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Images/1.png)
@@ -42,7 +41,9 @@ Programming Language :Python Version : 3.7  <br>
 ### Observations
 * From here we can observe one thing most of the customers who gave feedback they mostly used Desktop compare Mobile and Tablet .
 
+## Testing Model
 
+![images](https://raw.githubusercontent.com/Surekha-honey/Deep-Learning-Projects/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Images/6.png)
 
 
 
