@@ -3,12 +3,11 @@
 
 * [About the Project](#about-the-project)
 * [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
+  * [Prerequisites](#prerequisites) 
 * [Reading Dataset](#reading-dataset)
 * [Exploratory Data Analysis](#exploratory-data-analysis)
   * [Observations](#observations)
 * [Data Cleansing and Training Model](#data-cleansing-and-training-model)
-
 * [Testing Model](#testing-model)
 <!-- ABOUT THE PROJECT -->
 ## About The Project
