@@ -9,6 +9,7 @@
   * [Observations](#observations)
 * [Data Cleansing and Training Model](#data-cleansing-and-training-model)
 * [Testing Model](#testing-model)
+* [Acknowledgements](#acknowledgements)
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 ![images](https://raw.githubusercontent.com/Surekha-honey/Deep-Learning-Projects/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Images/1.png)
@@ -59,7 +60,9 @@ Programming Language :Python Version : 3.7  <br>
 
 ![images](https://raw.githubusercontent.com/Surekha-honey/Deep-Learning-Projects/master/NLP%20sentiment%20analysis/Customers%20review%20Analysis/Images/6.png)
 
-
+## Acknowledgements
+* To learn more aabout this you can learn here [NLTK](https://www.nltk.org/book/ch01.html) 
+* To learn more about Classification algorithms in sentiment analysis,visit this [URL](https://medium.com/sifium/machine-learning-types-of-classification-9497bd4f2e14)
 
 
 
