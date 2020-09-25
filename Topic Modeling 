@@ -1,0 +1,1932 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled17.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyO28+BUjx2rgPLQQ7M+xyA7",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Surekha-honey/Deep-Learning-Projects/blob/master/Topic%20Modeling%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "CAEPSsSFDMBb",
+        "colab_type": "text"
+      },
+      "source": [
+        "## Importing Libraries"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "48q0I-gZ1s0z",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import gensim\n",
+        "import numpy as np\n",
+        "import spacy\n",
+        "import pandas as pd\n",
+        "\n",
+        "from gensim.models import LdaModel\n",
+        "from gensim.models.wrappers import LdaMallet\n",
+        "from gensim.corpora import Dictionary\n",
+        "import pyLDAvis.gensim\n",
+        "import wikipedia\n",
+        "import re\n",
+        "\n",
+        "import warnings\n",
+        "warnings.filterwarnings('ignore')  # Let's not pay heed to them right now\n",
+        "%matplotlib inline"
+      ],
+      "execution_count": 1,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wbRdcS5C2SwN",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 394
+        },
+        "outputId": "1ee448d1-b581-42fa-a1ba-1816eb38f3ef"
+      },
+      "source": [
+        "pip install pyLDAvis"
+      ],
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: pyLDAvis in /usr/local/lib/python3.6/dist-packages (2.1.2)\n",
+            "Requirement already satisfied: wheel>=0.23.0 in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (0.35.1)\n",
+            "Requirement already satisfied: scipy>=0.18.0 in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (1.4.1)\n",
+            "Requirement already satisfied: jinja2>=2.7.2 in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (2.11.2)\n",
+            "Requirement already satisfied: numexpr in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (2.7.1)\n",
+            "Requirement already satisfied: pandas>=0.17.0 in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (1.0.5)\n",
+            "Requirement already satisfied: funcy in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (1.14)\n",
+            "Requirement already satisfied: numpy>=1.9.2 in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (1.18.5)\n",
+            "Requirement already satisfied: joblib>=0.8.4 in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (0.16.0)\n",
+            "Requirement already satisfied: pytest in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (3.6.4)\n",
+            "Requirement already satisfied: future in /usr/local/lib/python3.6/dist-packages (from pyLDAvis) (0.16.0)\n",
+            "Requirement already satisfied: MarkupSafe>=0.23 in /usr/local/lib/python3.6/dist-packages (from jinja2>=2.7.2->pyLDAvis) (1.1.1)\n",
+            "Requirement already satisfied: pytz>=2017.2 in /usr/local/lib/python3.6/dist-packages (from pandas>=0.17.0->pyLDAvis) (2018.9)\n",
+            "Requirement already satisfied: python-dateutil>=2.6.1 in /usr/local/lib/python3.6/dist-packages (from pandas>=0.17.0->pyLDAvis) (2.8.1)\n",
+            "Requirement already satisfied: attrs>=17.4.0 in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (20.2.0)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (50.3.0)\n",
+            "Requirement already satisfied: six>=1.10.0 in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (1.15.0)\n",
+            "Requirement already satisfied: pluggy<0.8,>=0.5 in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (0.7.1)\n",
+            "Requirement already satisfied: py>=1.5.0 in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (1.9.0)\n",
+            "Requirement already satisfied: more-itertools>=4.0.0 in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (8.5.0)\n",
+            "Requirement already satisfied: atomicwrites>=1.0 in /usr/local/lib/python3.6/dist-packages (from pytest->pyLDAvis) (1.4.0)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "oAWZgxQg2YO2",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 156
+        },
+        "outputId": "f20e7472-8053-4d1c-8bb1-1d61567b3f35"
+      },
+      "source": [
+        "pip install wikipedia"
+      ],
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: wikipedia in /usr/local/lib/python3.6/dist-packages (1.4.0)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.0.0 in /usr/local/lib/python3.6/dist-packages (from wikipedia) (2.23.0)\n",
+            "Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.6/dist-packages (from wikipedia) (4.6.3)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.6/dist-packages (from requests<3.0.0,>=2.0.0->wikipedia) (2020.6.20)\n",
+            "Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /usr/local/lib/python3.6/dist-packages (from requests<3.0.0,>=2.0.0->wikipedia) (1.24.3)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.6/dist-packages (from requests<3.0.0,>=2.0.0->wikipedia) (2.10)\n",
+            "Requirement already satisfied: chardet<4,>=3.0.2 in /usr/local/lib/python3.6/dist-packages (from requests<3.0.0,>=2.0.0->wikipedia) (3.0.4)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "TBEGcZ9TDWl8",
+        "colab_type": "text"
+      },
+      "source": [
+        " ## Reading Text file"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "xu8u6d7S2dtH",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "# Reading the data\n",
+        "text=open('/content/train_news.txt','r').read()"
+      ],
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "3_1sjHs221WV",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "def decontracted(phrase):\n",
+        "    # specific\n",
+        "    phrase = re.sub(r\"won't\", \"will not\", phrase)\n",
+        "    phrase = re.sub(r\"can\\'t\", \"can not\", phrase)\n",
+        "\n",
+        "    # general\n",
+        "    phrase = re.sub(r\"n\\'t\", \" not\", phrase)\n",
+        "    phrase = re.sub(r\"\\'re\", \" are\", phrase)\n",
+        "    phrase = re.sub(r\"\\'s\", \" is\", phrase)\n",
+        "    phrase = re.sub(r\"\\'d\", \" would\", phrase)\n",
+        "    phrase = re.sub(r\"\\'ll\", \" will\", phrase)\n",
+        "    phrase = re.sub(r\"\\'t\", \" not\", phrase)\n",
+        "    phrase = re.sub(r\"\\'ve\", \" have\", phrase)\n",
+        "    phrase = re.sub(r\"\\'m\", \" am\", phrase)\n",
+        "    return phrase"
+      ],
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wfK-kOqY25fk",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "def clean(sent):\n",
+        "    sent=decontracted(sent)\n",
+        "    sent=re.sub(r'https?://\\S+', '', sent)\n",
+        "    sent=re.sub(r'[\\w\\.-]+@[\\w\\.-]+', '', sent)\n",
+        "    sent = re.sub(\"\\S*\\d\\S*\", \"\", sent)\n",
+        "    sent=re.sub(r'[^A-Za-z0-9]+', ' ', sent)\n",
+        "    sent=sent.lower()\n",
+        "    sent = ' '.join(e for e in sent.split() if len(e)>2 )\n",
+        "    sent=sent.translate(str.maketrans('', '', '\"#%&\\'()*+,-./:;<=>@[\\\\]^_`{|}~'))\n",
+        "\n",
+        "    return sent"
+      ],
+      "execution_count": 6,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "qHxQh-RQ29JI",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "nlp = spacy.load(\"en\")"
+      ],
+      "execution_count": 7,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "CW9LsQuh3EWT",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "854eaed5-55c4-4aa8-9b25-1114f25c9f45"
+      },
+      "source": [
+        "cleaned=[]\n",
+        "for i in text.split('\\n'):\n",
+        "    sent=nlp(clean(i))\n",
+        "    cleaned.append(sent)\n",
+        "print(len(cleaned))"
+      ],
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "444\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "g4MXZdxO3Ip1",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "article, texts = [], []\n",
+        "for doc in cleaned:\n",
+        "    for w in doc:\n",
+        "        # if it's not a stop word or punctuation mark, add it to our article\n",
+        "        if not w.is_stop and not w.is_punct and not w.like_num:\n",
+        "            # we add the lematized version of the word\n",
+        "            article.append(w.lemma_)\n",
+        "    texts.append(article)\n",
+        "    article=[]"
+      ],
+      "execution_count": 9,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Lr63iZov7ZqH",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "c52fc196-3e4c-4d3d-be95-d4efe001c114"
+      },
+      "source": [
+        "len(texts)"
+      ],
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "444"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 10
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0GBSYJ2R7cj-",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "bigram = gensim.models.Phrases(texts)"
+      ],
+      "execution_count": 11,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "y1EuJa1P7f1Y",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "texts = [bigram[line] for line in texts]"
+      ],
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Acq4tVtL7ill",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 187
+        },
+        "outputId": "88e37542-8629-47b3-cb81-879dcef0cc30"
+      },
+      "source": [
+        "texts[4][:10]"
+      ],
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['anushka',\n",
+              " 'shetty',\n",
+              " 'madhavan',\n",
+              " 'starrer',\n",
+              " 'nishabdam',\n",
+              " 'skip',\n",
+              " 'theatrical',\n",
+              " 'release',\n",
+              " 'digital',\n",
+              " 'route']"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "BRt2WQ237mDa",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "dictionary = Dictionary(texts)\n",
+        "corpus = [dictionary.doc2bow(text) for text in texts]"
+      ],
+      "execution_count": 14,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "hkSkTt077snH",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "ldamodel = LdaModel(corpus=corpus, num_topics=20, id2word=dictionary, passes=50, random_state=0)"
+      ],
+      "execution_count": 15,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Di2cZSct7u_6",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 717
+        },
+        "outputId": "1d817daf-5d87-47b7-ce15-f21b423f610d"
+      },
+      "source": [
+        "topics=ldamodel.print_topics(num_words=10)\n",
+        "topics"
+      ],
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.009*\"say\" + 0.007*\"investigation\" + 0.006*\"sirsa\" + 0.006*\"death\" + 0.006*\"complaint\" + 0.005*\"die\" + 0.005*\"police\" + 0.005*\"mumbai_police\" + 0.005*\"drug\" + 0.004*\"video\"'),\n",
+              " (1,\n",
+              "  '0.018*\"say\" + 0.007*\"case\" + 0.006*\"year\" + 0.006*\"vaccine\" + 0.006*\"india\" + 0.006*\"ordinance\" + 0.006*\"government\" + 0.005*\"country\" + 0.004*\"pandemic\" + 0.004*\"trial\"'),\n",
+              " (2,\n",
+              "  '0.015*\"say\" + 0.008*\"state\" + 0.006*\"government\" + 0.005*\"people\" + 0.005*\"centre\" + 0.005*\"university\" + 0.004*\"year\" + 0.004*\"patient\" + 0.004*\"india\" + 0.004*\"service\"'),\n",
+              " (3,\n",
+              "  '0.010*\"people\" + 0.009*\"food\" + 0.009*\"say\" + 0.006*\"kapoor\" + 0.006*\"riddhima\" + 0.005*\"neetu\" + 0.005*\"time\" + 0.005*\"bpsc\" + 0.005*\"order\" + 0.004*\"home\"'),\n",
+              " (4,\n",
+              "  '0.013*\"say\" + 0.006*\"people\" + 0.005*\"plan\" + 0.005*\"arrest\" + 0.005*\"hold\" + 0.005*\"take\" + 0.003*\"stage\" + 0.003*\"donaldson\" + 0.003*\"read\" + 0.003*\"pakistan\"'),\n",
+              " (5,\n",
+              "  '0.015*\"say\" + 0.010*\"student\" + 0.010*\"government\" + 0.009*\"school\" + 0.009*\"education\" + 0.005*\"project\" + 0.005*\"child\" + 0.005*\"college\" + 0.005*\"ministry\" + 0.004*\"include\"'),\n",
+              " (6,\n",
+              "  '0.008*\"say\" + 0.008*\"cent\" + 0.008*\"bank\" + 0.007*\"market\" + 0.005*\"capital\" + 0.005*\"case\" + 0.005*\"equity\" + 0.005*\"country\" + 0.004*\"investor\" + 0.004*\"day\"'),\n",
+              " (7,\n",
+              "  '0.018*\"say\" + 0.007*\"candidate\" + 0.005*\"show\" + 0.005*\"government\" + 0.004*\"guardian\" + 0.004*\"story\" + 0.004*\"state\" + 0.004*\"post\" + 0.004*\"board\" + 0.004*\"movie\"'),\n",
+              " (8,\n",
+              "  '0.013*\"india\" + 0.011*\"say\" + 0.010*\"cent\" + 0.007*\"government\" + 0.006*\"september\" + 0.005*\"pandemic\" + 0.004*\"pakistan\" + 0.004*\"low\" + 0.004*\"likely\" + 0.004*\"crore\"'),\n",
+              " (9,\n",
+              "  '0.012*\"september\" + 0.010*\"jee_main\" + 0.010*\"candidate\" + 0.010*\"examination\" + 0.009*\"result\" + 0.008*\"read\" + 0.008*\"student\" + 0.008*\"online\" + 0.008*\"admit_card\" + 0.007*\"credit\"'),\n",
+              " (10,\n",
+              "  '0.011*\"say\" + 0.008*\"people\" + 0.008*\"government\" + 0.006*\"india\" + 0.006*\"price\" + 0.005*\"economy\" + 0.005*\"rise\" + 0.005*\"film_industry\" + 0.005*\"industry\" + 0.004*\"facebook\"'),\n",
+              " (11,\n",
+              "  '0.016*\"ipl\" + 0.012*\"team\" + 0.010*\"play\" + 0.009*\"csk\" + 0.009*\"player\" + 0.009*\"match\" + 0.009*\"run\" + 0.008*\"game\" + 0.008*\"say\" + 0.008*\"year\"'),\n",
+              " (12,\n",
+              "  '0.013*\"say\" + 0.010*\"book\" + 0.007*\"trade\" + 0.007*\"industry\" + 0.007*\"food\" + 0.006*\"india\" + 0.006*\"import\" + 0.006*\"year\" + 0.005*\"sector\" + 0.004*\"assange\"'),\n",
+              " (13,\n",
+              "  '0.018*\"say\" + 0.007*\"actor\" + 0.007*\"people\" + 0.007*\"write\" + 0.005*\"film\" + 0.005*\"life\" + 0.005*\"come\" + 0.005*\"year\" + 0.005*\"want\" + 0.005*\"time\"'),\n",
+              " (14,\n",
+              "  '0.012*\"say\" + 0.010*\"crore\" + 0.010*\"railway\" + 0.008*\"bank\" + 0.007*\"anurag\" + 0.006*\"government\" + 0.005*\"sushant\" + 0.005*\"power_sector\" + 0.005*\"member\" + 0.005*\"meet\"'),\n",
+              " (15,\n",
+              "  '0.032*\"india\" + 0.030*\"china\" + 0.010*\"say\" + 0.010*\"country\" + 0.009*\"chinese\" + 0.007*\"border\" + 0.005*\"agreement\" + 0.005*\"military\" + 0.005*\"world\" + 0.005*\"indian\"'),\n",
+              " (16,\n",
+              "  '0.008*\"say\" + 0.006*\"experience\" + 0.004*\"year\" + 0.004*\"student\" + 0.004*\"watch\" + 0.004*\"gavaskar\" + 0.004*\"time\" + 0.003*\"vaccine\" + 0.003*\"film\" + 0.003*\"company\"'),\n",
+              " (17,\n",
+              "  '0.010*\"india\" + 0.007*\"party\" + 0.007*\"pakistan\" + 0.006*\"sharma\" + 0.006*\"police\" + 0.006*\"state\" + 0.006*\"case\" + 0.005*\"teacher\" + 0.005*\"political\" + 0.004*\"nepal\"'),\n",
+              " (18,\n",
+              "  '0.018*\"say\" + 0.013*\"trump\" + 0.007*\"state\" + 0.006*\"year\" + 0.006*\"president\" + 0.006*\"biden\" + 0.005*\"election\" + 0.004*\"government\" + 0.004*\"court\" + 0.004*\"people\"'),\n",
+              " (19,\n",
+              "  '0.019*\"exam\" + 0.013*\"candidate\" + 0.011*\"say\" + 0.009*\"student\" + 0.009*\"question\" + 0.007*\"examination\" + 0.006*\"woman\" + 0.006*\"neet\" + 0.006*\"centre\" + 0.005*\"college\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "uChzgBNN713K",
+        "colab_type": "text"
+      },
+      "source": [
+        "\n",
+        " The word say and cent is unnecesserily occuring again and again\n",
+        " Lets remove it from the corpus . Also, lets take 15 topics and increase the number of passes"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "NsTwRqwz7xsx",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "my_stop_words = [u'say', u'cent', u'\\'s', u'Mr', u'be', u'said', u'says', u'saying']\n",
+        "for stopword in my_stop_words:\n",
+        "    lexeme = nlp.vocab[stopword]\n",
+        "    lexeme.is_stop = True"
+      ],
+      "execution_count": 17,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ExDzTPy77-U_",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "ldamodel1 = LdaModel(corpus=corpus, num_topics=15, id2word=dictionary, passes=80, random_state=0)"
+      ],
+      "execution_count": 18,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "NlofGHRR8BBI",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 547
+        },
+        "outputId": "5651a2cc-217d-40b6-cf12-dbda9e42c62d"
+      },
+      "source": [
+        "topics1=ldamodel1.print_topics(num_words=10)\n",
+        "topics1"
+      ],
+      "execution_count": 19,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.012*\"india\" + 0.008*\"china\" + 0.008*\"vaccine\" + 0.006*\"country\" + 0.006*\"japan\" + 0.006*\"say\" + 0.005*\"woman\" + 0.005*\"abe\" + 0.004*\"cut\" + 0.004*\"vaccination\"'),\n",
+              " (1,\n",
+              "  '0.023*\"say\" + 0.008*\"trump\" + 0.007*\"year\" + 0.006*\"vaccine\" + 0.006*\"candidate\" + 0.006*\"state\" + 0.005*\"country\" + 0.005*\"exam\" + 0.004*\"case\" + 0.004*\"government\"'),\n",
+              " (2,\n",
+              "  '0.011*\"say\" + 0.007*\"people\" + 0.006*\"government\" + 0.005*\"state\" + 0.004*\"court\" + 0.003*\"justice\" + 0.003*\"need\" + 0.003*\"india\" + 0.003*\"university\" + 0.003*\"patient\"'),\n",
+              " (3,\n",
+              "  '0.009*\"food\" + 0.008*\"people\" + 0.005*\"say\" + 0.005*\"lakh\" + 0.005*\"company\" + 0.004*\"come\" + 0.004*\"sonet\" + 0.004*\"start\" + 0.003*\"project\" + 0.003*\"price\"'),\n",
+              " (4,\n",
+              "  '0.016*\"india\" + 0.009*\"say\" + 0.007*\"pakistan\" + 0.006*\"china\" + 0.004*\"country\" + 0.004*\"security\" + 0.004*\"app\" + 0.003*\"united_states\" + 0.003*\"new\" + 0.003*\"state\"'),\n",
+              " (5,\n",
+              "  '0.015*\"say\" + 0.007*\"college\" + 0.006*\"state\" + 0.005*\"student\" + 0.005*\"school\" + 0.004*\"time\" + 0.004*\"support\" + 0.004*\"education\" + 0.004*\"government\" + 0.003*\"airport\"'),\n",
+              " (6,\n",
+              "  '0.016*\"ipl\" + 0.013*\"team\" + 0.011*\"say\" + 0.010*\"play\" + 0.009*\"csk\" + 0.009*\"player\" + 0.009*\"run\" + 0.008*\"year\" + 0.008*\"mumbai_indians\" + 0.008*\"match\"'),\n",
+              " (7,\n",
+              "  '0.015*\"say\" + 0.007*\"actor\" + 0.006*\"film\" + 0.005*\"aarav\" + 0.004*\"story\" + 0.004*\"tell\" + 0.004*\"time\" + 0.004*\"board\" + 0.003*\"government\" + 0.003*\"show\"'),\n",
+              " (8,\n",
+              "  '0.010*\"say\" + 0.006*\"write\" + 0.006*\"india\" + 0.005*\"woman\" + 0.004*\"post\" + 0.004*\"week\" + 0.004*\"love\" + 0.004*\"teacher\" + 0.004*\"day\" + 0.004*\"september\"'),\n",
+              " (9,\n",
+              "  '0.012*\"exam\" + 0.012*\"student\" + 0.011*\"candidate\" + 0.011*\"examination\" + 0.011*\"september\" + 0.008*\"result\" + 0.007*\"online\" + 0.007*\"jee_main\" + 0.006*\"conduct\" + 0.006*\"read\"'),\n",
+              " (10,\n",
+              "  '0.014*\"say\" + 0.010*\"government\" + 0.007*\"india\" + 0.007*\"pandemic\" + 0.007*\"cent\" + 0.007*\"market\" + 0.006*\"economy\" + 0.006*\"bank\" + 0.006*\"year\" + 0.005*\"company\"'),\n",
+              " (11,\n",
+              "  '0.018*\"india\" + 0.017*\"china\" + 0.006*\"border\" + 0.006*\"chinese\" + 0.004*\"time\" + 0.004*\"question\" + 0.004*\"indian\" + 0.004*\"watch\" + 0.003*\"world\" + 0.003*\"england\"'),\n",
+              " (12,\n",
+              "  '0.010*\"say\" + 0.004*\"trade\" + 0.004*\"year\" + 0.004*\"industry\" + 0.004*\"time\" + 0.004*\"india\" + 0.004*\"import\" + 0.004*\"assange\" + 0.003*\"good\" + 0.003*\"fta\"'),\n",
+              " (13,\n",
+              "  '0.019*\"say\" + 0.007*\"people\" + 0.005*\"year\" + 0.004*\"actor\" + 0.004*\"come\" + 0.004*\"india\" + 0.004*\"time\" + 0.004*\"write\" + 0.004*\"police\" + 0.004*\"day\"'),\n",
+              " (14,\n",
+              "  '0.018*\"say\" + 0.010*\"party\" + 0.007*\"state\" + 0.006*\"nlsiu\" + 0.005*\"congress\" + 0.005*\"plea\" + 0.005*\"gandhi\" + 0.004*\"anurag\" + 0.004*\"member\" + 0.004*\"sushant\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 19
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "UOa_B17J8Dty",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 377
+        },
+        "outputId": "7e6a4055-9415-4d30-ea00-72507db042b0"
+      },
+      "source": [
+        "ldamodel2 = LdaModel(corpus=corpus, num_topics=10, id2word=dictionary, passes=60, random_state=0)\n",
+        "topics2=ldamodel2.print_topics(num_words=10)\n",
+        "topics2"
+      ],
+      "execution_count": 20,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.009*\"say\" + 0.005*\"woman\" + 0.004*\"case\" + 0.004*\"charge\" + 0.003*\"india\" + 0.003*\"drug\" + 0.003*\"year\" + 0.003*\"ncb\" + 0.003*\"abe\" + 0.003*\"add\"'),\n",
+              " (1,\n",
+              "  '0.019*\"say\" + 0.007*\"vaccine\" + 0.006*\"year\" + 0.006*\"student\" + 0.005*\"exam\" + 0.005*\"case\" + 0.005*\"government\" + 0.005*\"state\" + 0.005*\"candidate\" + 0.005*\"question\"'),\n",
+              " (2,\n",
+              "  '0.013*\"say\" + 0.006*\"government\" + 0.005*\"state\" + 0.005*\"trump\" + 0.004*\"india\" + 0.004*\"year\" + 0.003*\"people\" + 0.003*\"election\" + 0.003*\"university\" + 0.003*\"court\"'),\n",
+              " (3,\n",
+              "  '0.011*\"people\" + 0.010*\"say\" + 0.007*\"film_industry\" + 0.006*\"industry\" + 0.004*\"speak\" + 0.004*\"come\" + 0.004*\"work\" + 0.004*\"kangana\" + 0.004*\"taiwan\" + 0.004*\"drug\"'),\n",
+              " (4,\n",
+              "  '0.017*\"india\" + 0.014*\"china\" + 0.013*\"say\" + 0.006*\"country\" + 0.005*\"chinese\" + 0.005*\"government\" + 0.005*\"pakistan\" + 0.004*\"world\" + 0.003*\"year\" + 0.003*\"indian\"'),\n",
+              " (5,\n",
+              "  '0.016*\"say\" + 0.008*\"student\" + 0.007*\"school\" + 0.006*\"government\" + 0.005*\"state\" + 0.005*\"education\" + 0.004*\"college\" + 0.004*\"work\" + 0.004*\"report\" + 0.004*\"teacher\"'),\n",
+              " (6,\n",
+              "  '0.011*\"say\" + 0.011*\"ipl\" + 0.009*\"team\" + 0.007*\"play\" + 0.007*\"year\" + 0.007*\"player\" + 0.007*\"csk\" + 0.006*\"run\" + 0.006*\"game\" + 0.006*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.011*\"say\" + 0.008*\"actor\" + 0.007*\"time\" + 0.006*\"film\" + 0.006*\"people\" + 0.004*\"write\" + 0.004*\"want\" + 0.004*\"sushant\" + 0.004*\"story\" + 0.004*\"see\"'),\n",
+              " (8,\n",
+              "  '0.010*\"say\" + 0.006*\"india\" + 0.006*\"write\" + 0.005*\"people\" + 0.005*\"day\" + 0.004*\"post\" + 0.004*\"video\" + 0.004*\"film\" + 0.004*\"actor\" + 0.004*\"see\"'),\n",
+              " (9,\n",
+              "  '0.010*\"september\" + 0.008*\"candidate\" + 0.008*\"examination\" + 0.007*\"exam\" + 0.007*\"jee_main\" + 0.006*\"result\" + 0.006*\"say\" + 0.005*\"online\" + 0.005*\"admit_card\" + 0.005*\"read\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "mRUCYixx8HnC",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 377
+        },
+        "outputId": "090af608-a0ca-49a0-bca5-9f10fcb96538"
+      },
+      "source": [
+        "ldamodel3 = LdaModel(corpus=corpus, num_topics=10, id2word=dictionary, passes=100, random_state=0)\n",
+        "topics3=ldamodel3.print_topics(num_words=10)\n",
+        "topics3"
+      ],
+      "execution_count": 21,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.009*\"say\" + 0.005*\"woman\" + 0.004*\"case\" + 0.004*\"charge\" + 0.003*\"drug\" + 0.003*\"ncb\" + 0.003*\"year\" + 0.003*\"india\" + 0.003*\"abe\" + 0.003*\"die\"'),\n",
+              " (1,\n",
+              "  '0.019*\"say\" + 0.007*\"vaccine\" + 0.006*\"year\" + 0.006*\"case\" + 0.006*\"student\" + 0.006*\"exam\" + 0.005*\"state\" + 0.005*\"candidate\" + 0.005*\"government\" + 0.005*\"question\"'),\n",
+              " (2,\n",
+              "  '0.013*\"say\" + 0.006*\"government\" + 0.005*\"state\" + 0.005*\"trump\" + 0.004*\"india\" + 0.004*\"year\" + 0.003*\"people\" + 0.003*\"need\" + 0.003*\"court\" + 0.003*\"election\"'),\n",
+              " (3,\n",
+              "  '0.011*\"people\" + 0.010*\"say\" + 0.007*\"film_industry\" + 0.006*\"industry\" + 0.004*\"speak\" + 0.004*\"work\" + 0.004*\"come\" + 0.004*\"kangana\" + 0.004*\"taiwan\" + 0.004*\"drug\"'),\n",
+              " (4,\n",
+              "  '0.017*\"india\" + 0.013*\"say\" + 0.013*\"china\" + 0.006*\"country\" + 0.006*\"government\" + 0.005*\"chinese\" + 0.004*\"pakistan\" + 0.004*\"world\" + 0.004*\"year\" + 0.003*\"trade\"'),\n",
+              " (5,\n",
+              "  '0.016*\"say\" + 0.008*\"student\" + 0.007*\"school\" + 0.006*\"state\" + 0.006*\"government\" + 0.005*\"education\" + 0.004*\"college\" + 0.004*\"teacher\" + 0.004*\"work\" + 0.004*\"report\"'),\n",
+              " (6,\n",
+              "  '0.011*\"ipl\" + 0.011*\"say\" + 0.009*\"team\" + 0.008*\"play\" + 0.007*\"year\" + 0.007*\"player\" + 0.007*\"csk\" + 0.006*\"run\" + 0.006*\"mumbai_indians\" + 0.006*\"game\"'),\n",
+              " (7,\n",
+              "  '0.011*\"say\" + 0.008*\"actor\" + 0.007*\"time\" + 0.006*\"film\" + 0.006*\"people\" + 0.004*\"write\" + 0.004*\"want\" + 0.004*\"story\" + 0.004*\"sushant\" + 0.004*\"tell\"'),\n",
+              " (8,\n",
+              "  '0.009*\"say\" + 0.006*\"write\" + 0.006*\"india\" + 0.005*\"people\" + 0.005*\"day\" + 0.005*\"post\" + 0.004*\"see\" + 0.004*\"film\" + 0.004*\"video\" + 0.004*\"actor\"'),\n",
+              " (9,\n",
+              "  '0.011*\"september\" + 0.009*\"candidate\" + 0.009*\"examination\" + 0.008*\"exam\" + 0.007*\"result\" + 0.007*\"jee_main\" + 0.006*\"online\" + 0.005*\"admit_card\" + 0.005*\"read\" + 0.005*\"paper\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 21
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "XSuZ46Th8KN7",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 309
+        },
+        "outputId": "b726564b-f5e8-4b5d-9665-be6c27f58a01"
+      },
+      "source": [
+        "ldamodel4 = LdaModel(corpus=corpus, num_topics=8, id2word=dictionary, passes=80, random_state=0)\n",
+        "topics4=ldamodel4.print_topics(num_words=10)\n",
+        "topics4"
+      ],
+      "execution_count": 22,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.011*\"say\" + 0.008*\"government\" + 0.008*\"cent\" + 0.007*\"india\" + 0.005*\"economy\" + 0.004*\"crore\" + 0.004*\"bank\" + 0.004*\"year\" + 0.004*\"sector\" + 0.004*\"quarter\"'),\n",
+              " (1,\n",
+              "  '0.018*\"say\" + 0.006*\"student\" + 0.006*\"year\" + 0.006*\"exam\" + 0.005*\"candidate\" + 0.005*\"vaccine\" + 0.005*\"country\" + 0.005*\"case\" + 0.005*\"government\" + 0.004*\"state\"'),\n",
+              " (2,\n",
+              "  '0.014*\"say\" + 0.007*\"state\" + 0.006*\"trump\" + 0.005*\"year\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"india\" + 0.003*\"biden\" + 0.003*\"university\" + 0.003*\"need\"'),\n",
+              " (3,\n",
+              "  '0.011*\"people\" + 0.011*\"say\" + 0.006*\"film_industry\" + 0.005*\"industry\" + 0.004*\"film\" + 0.004*\"come\" + 0.004*\"actor\" + 0.004*\"work\" + 0.003*\"speak\" + 0.003*\"taiwan\"'),\n",
+              " (4,\n",
+              "  '0.018*\"india\" + 0.015*\"china\" + 0.009*\"say\" + 0.006*\"chinese\" + 0.005*\"pakistan\" + 0.004*\"country\" + 0.004*\"indian\" + 0.003*\"border\" + 0.003*\"party\" + 0.003*\"plan\"'),\n",
+              " (5,\n",
+              "  '0.014*\"say\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"india\" + 0.003*\"case\" + 0.003*\"work\" + 0.003*\"state\" + 0.003*\"report\" + 0.003*\"medium\" + 0.003*\"issue\"'),\n",
+              " (6,\n",
+              "  '0.011*\"ipl\" + 0.009*\"say\" + 0.009*\"team\" + 0.007*\"play\" + 0.007*\"year\" + 0.006*\"csk\" + 0.006*\"player\" + 0.006*\"run\" + 0.006*\"match\" + 0.006*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.011*\"say\" + 0.008*\"actor\" + 0.007*\"write\" + 0.007*\"film\" + 0.006*\"time\" + 0.005*\"tell\" + 0.004*\"share\" + 0.004*\"people\" + 0.004*\"love\" + 0.004*\"know\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "IBCkbayw8MUo",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 309
+        },
+        "outputId": "f8214980-c6dd-47ec-ddde-5037aca115ed"
+      },
+      "source": [
+        "ldamodel5 = LdaModel(corpus=corpus, num_topics=8, id2word=dictionary, passes=100, random_state=0)\n",
+        "topics5=ldamodel5.print_topics(num_words=10)\n",
+        "topics5"
+      ],
+      "execution_count": 23,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.011*\"say\" + 0.008*\"government\" + 0.008*\"cent\" + 0.007*\"india\" + 0.006*\"economy\" + 0.005*\"bank\" + 0.005*\"crore\" + 0.005*\"year\" + 0.004*\"market\" + 0.004*\"sector\"'),\n",
+              " (1,\n",
+              "  '0.018*\"say\" + 0.006*\"student\" + 0.006*\"exam\" + 0.006*\"year\" + 0.005*\"candidate\" + 0.005*\"vaccine\" + 0.005*\"country\" + 0.005*\"case\" + 0.005*\"government\" + 0.004*\"state\"'),\n",
+              " (2,\n",
+              "  '0.014*\"say\" + 0.007*\"state\" + 0.006*\"trump\" + 0.005*\"year\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"india\" + 0.004*\"biden\" + 0.003*\"university\" + 0.003*\"need\"'),\n",
+              " (3,\n",
+              "  '0.012*\"people\" + 0.011*\"say\" + 0.006*\"film_industry\" + 0.005*\"industry\" + 0.004*\"come\" + 0.004*\"film\" + 0.004*\"work\" + 0.003*\"actor\" + 0.003*\"taiwan\" + 0.003*\"speak\"'),\n",
+              " (4,\n",
+              "  '0.018*\"india\" + 0.015*\"china\" + 0.009*\"say\" + 0.006*\"chinese\" + 0.005*\"pakistan\" + 0.005*\"country\" + 0.004*\"indian\" + 0.003*\"border\" + 0.003*\"party\" + 0.003*\"plan\"'),\n",
+              " (5,\n",
+              "  '0.014*\"say\" + 0.005*\"government\" + 0.004*\"india\" + 0.004*\"people\" + 0.004*\"case\" + 0.003*\"state\" + 0.003*\"report\" + 0.003*\"work\" + 0.003*\"medium\" + 0.003*\"issue\"'),\n",
+              " (6,\n",
+              "  '0.011*\"ipl\" + 0.009*\"say\" + 0.009*\"team\" + 0.007*\"play\" + 0.007*\"year\" + 0.007*\"csk\" + 0.006*\"player\" + 0.006*\"run\" + 0.006*\"match\" + 0.006*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.011*\"say\" + 0.009*\"actor\" + 0.008*\"write\" + 0.007*\"film\" + 0.006*\"time\" + 0.005*\"tell\" + 0.005*\"share\" + 0.005*\"people\" + 0.004*\"love\" + 0.004*\"know\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iQy_OnQD8Oyf",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 309
+        },
+        "outputId": "ae69c345-23ce-479a-c12a-88a14c8fe7a1"
+      },
+      "source": [
+        "ldamodel6 = LdaModel(corpus=corpus, num_topics=8, id2word=dictionary, passes=60, random_state=0)\n",
+        "topics6=ldamodel6.print_topics(num_words=10)\n",
+        "topics6"
+      ],
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.011*\"say\" + 0.008*\"government\" + 0.007*\"india\" + 0.007*\"cent\" + 0.005*\"economy\" + 0.004*\"year\" + 0.004*\"quarter\" + 0.004*\"sector\" + 0.004*\"pandemic\" + 0.004*\"bank\"'),\n",
+              " (1,\n",
+              "  '0.018*\"say\" + 0.006*\"student\" + 0.006*\"year\" + 0.005*\"exam\" + 0.005*\"vaccine\" + 0.005*\"candidate\" + 0.005*\"country\" + 0.005*\"government\" + 0.005*\"case\" + 0.004*\"state\"'),\n",
+              " (2,\n",
+              "  '0.014*\"say\" + 0.007*\"state\" + 0.006*\"trump\" + 0.005*\"year\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"india\" + 0.004*\"university\" + 0.003*\"biden\" + 0.003*\"need\"'),\n",
+              " (3,\n",
+              "  '0.011*\"people\" + 0.010*\"say\" + 0.006*\"film_industry\" + 0.005*\"industry\" + 0.004*\"film\" + 0.004*\"come\" + 0.004*\"actor\" + 0.004*\"work\" + 0.003*\"september\" + 0.003*\"kapoor\"'),\n",
+              " (4,\n",
+              "  '0.018*\"india\" + 0.015*\"china\" + 0.009*\"say\" + 0.006*\"chinese\" + 0.005*\"pakistan\" + 0.004*\"country\" + 0.004*\"indian\" + 0.003*\"border\" + 0.003*\"party\" + 0.003*\"plan\"'),\n",
+              " (5,\n",
+              "  '0.014*\"say\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"india\" + 0.003*\"case\" + 0.003*\"work\" + 0.003*\"state\" + 0.003*\"report\" + 0.003*\"medium\" + 0.003*\"time\"'),\n",
+              " (6,\n",
+              "  '0.010*\"ipl\" + 0.009*\"say\" + 0.009*\"team\" + 0.007*\"play\" + 0.007*\"year\" + 0.006*\"csk\" + 0.006*\"player\" + 0.006*\"run\" + 0.006*\"match\" + 0.005*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.012*\"say\" + 0.007*\"actor\" + 0.007*\"write\" + 0.007*\"film\" + 0.006*\"time\" + 0.005*\"tell\" + 0.004*\"share\" + 0.004*\"love\" + 0.004*\"people\" + 0.004*\"family\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Gme8AjWt8RNn",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 309
+        },
+        "outputId": "aa35140f-c048-4dc2-9e41-08d8c6aebfc3"
+      },
+      "source": [
+        "ldamodel7 = LdaModel(corpus=corpus, num_topics=8, id2word=dictionary, passes=150, random_state=0)\n",
+        "topics7=ldamodel7.print_topics(num_words=10)\n",
+        "topics7"
+      ],
+      "execution_count": 25,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.012*\"say\" + 0.009*\"government\" + 0.009*\"cent\" + 0.007*\"india\" + 0.006*\"economy\" + 0.006*\"market\" + 0.006*\"bank\" + 0.005*\"crore\" + 0.005*\"year\" + 0.005*\"sector\"'),\n",
+              " (1,\n",
+              "  '0.018*\"say\" + 0.006*\"student\" + 0.006*\"exam\" + 0.006*\"year\" + 0.005*\"candidate\" + 0.005*\"vaccine\" + 0.005*\"case\" + 0.005*\"country\" + 0.005*\"state\" + 0.004*\"government\"'),\n",
+              " (2,\n",
+              "  '0.014*\"say\" + 0.007*\"state\" + 0.006*\"trump\" + 0.005*\"year\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"india\" + 0.004*\"biden\" + 0.003*\"university\" + 0.003*\"need\"'),\n",
+              " (3,\n",
+              "  '0.012*\"people\" + 0.011*\"say\" + 0.006*\"film_industry\" + 0.005*\"industry\" + 0.004*\"come\" + 0.004*\"film\" + 0.004*\"work\" + 0.003*\"taiwan\" + 0.003*\"actor\" + 0.003*\"speak\"'),\n",
+              " (4,\n",
+              "  '0.018*\"india\" + 0.015*\"china\" + 0.009*\"say\" + 0.006*\"chinese\" + 0.005*\"pakistan\" + 0.005*\"country\" + 0.004*\"indian\" + 0.003*\"border\" + 0.003*\"party\" + 0.003*\"plan\"'),\n",
+              " (5,\n",
+              "  '0.013*\"say\" + 0.005*\"government\" + 0.004*\"india\" + 0.004*\"case\" + 0.003*\"state\" + 0.003*\"people\" + 0.003*\"report\" + 0.003*\"medium\" + 0.003*\"work\" + 0.003*\"issue\"'),\n",
+              " (6,\n",
+              "  '0.011*\"ipl\" + 0.009*\"say\" + 0.009*\"team\" + 0.007*\"play\" + 0.007*\"year\" + 0.007*\"csk\" + 0.006*\"player\" + 0.006*\"run\" + 0.006*\"match\" + 0.006*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.011*\"say\" + 0.009*\"actor\" + 0.008*\"write\" + 0.008*\"film\" + 0.006*\"time\" + 0.005*\"people\" + 0.005*\"share\" + 0.005*\"tell\" + 0.004*\"love\" + 0.004*\"know\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 25
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "FyG_Bq7n8TiB",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 275
+        },
+        "outputId": "be9c0662-e7d3-44b1-b080-310e24ea7f11"
+      },
+      "source": [
+        "ldamodel8 = LdaModel(corpus=corpus, num_topics=7, id2word=dictionary, passes=150, random_state=0)\n",
+        "topics8=ldamodel8.print_topics(num_words=10)\n",
+        "topics8"
+      ],
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.012*\"say\" + 0.008*\"government\" + 0.008*\"cent\" + 0.007*\"bank\" + 0.007*\"india\" + 0.007*\"market\" + 0.005*\"crore\" + 0.005*\"economy\" + 0.005*\"sector\" + 0.004*\"economic\"'),\n",
+              " (1,\n",
+              "  '0.019*\"say\" + 0.006*\"state\" + 0.006*\"year\" + 0.006*\"student\" + 0.006*\"exam\" + 0.005*\"candidate\" + 0.005*\"country\" + 0.004*\"vaccine\" + 0.004*\"pandemic\" + 0.004*\"government\"'),\n",
+              " (2,\n",
+              "  '0.012*\"say\" + 0.005*\"state\" + 0.005*\"government\" + 0.004*\"people\" + 0.004*\"trump\" + 0.004*\"india\" + 0.004*\"year\" + 0.003*\"university\" + 0.003*\"day\" + 0.003*\"time\"'),\n",
+              " (3,\n",
+              "  '0.010*\"people\" + 0.010*\"actor\" + 0.009*\"say\" + 0.009*\"film\" + 0.006*\"write\" + 0.005*\"time\" + 0.005*\"share\" + 0.005*\"video\" + 0.004*\"work\" + 0.004*\"come\"'),\n",
+              " (4,\n",
+              "  '0.018*\"india\" + 0.013*\"china\" + 0.010*\"say\" + 0.005*\"chinese\" + 0.004*\"country\" + 0.004*\"pakistan\" + 0.003*\"indian\" + 0.003*\"year\" + 0.003*\"september\" + 0.003*\"border\"'),\n",
+              " (5,\n",
+              "  '0.013*\"say\" + 0.004*\"government\" + 0.004*\"people\" + 0.004*\"student\" + 0.003*\"report\" + 0.003*\"case\" + 0.003*\"state\" + 0.003*\"education\" + 0.003*\"school\" + 0.003*\"time\"'),\n",
+              " (6,\n",
+              "  '0.010*\"ipl\" + 0.010*\"say\" + 0.009*\"team\" + 0.007*\"play\" + 0.007*\"year\" + 0.006*\"csk\" + 0.006*\"player\" + 0.006*\"run\" + 0.006*\"match\" + 0.005*\"mumbai_indians\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 26
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lS-8ECU08WXB",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 343
+        },
+        "outputId": "107c40ce-dea8-4582-81a3-1630665ea7e9"
+      },
+      "source": [
+        "ldamodel9 = LdaModel(corpus=corpus, num_topics=9, id2word=dictionary, passes=150, random_state=0)\n",
+        "topics9=ldamodel9.print_topics(num_words=10)\n",
+        "topics9"
+      ],
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.008*\"say\" + 0.008*\"government\" + 0.006*\"bank\" + 0.004*\"crore\" + 0.004*\"india\" + 0.004*\"woman\" + 0.004*\"gdp\" + 0.003*\"fiscal\" + 0.003*\"farmer\" + 0.003*\"year\"'),\n",
+              " (1,\n",
+              "  '0.019*\"say\" + 0.007*\"year\" + 0.007*\"government\" + 0.006*\"pandemic\" + 0.006*\"vaccine\" + 0.006*\"country\" + 0.005*\"india\" + 0.005*\"case\" + 0.005*\"state\" + 0.004*\"people\"'),\n",
+              " (2,\n",
+              "  '0.013*\"say\" + 0.006*\"state\" + 0.005*\"people\" + 0.005*\"trump\" + 0.005*\"government\" + 0.005*\"india\" + 0.004*\"year\" + 0.003*\"court\" + 0.003*\"election\" + 0.003*\"need\"'),\n",
+              " (3,\n",
+              "  '0.007*\"people\" + 0.007*\"say\" + 0.004*\"taiwan\" + 0.004*\"india\" + 0.004*\"time\" + 0.003*\"come\" + 0.003*\"start\" + 0.003*\"lakh\" + 0.003*\"food\" + 0.003*\"project\"'),\n",
+              " (4,\n",
+              "  '0.018*\"india\" + 0.015*\"china\" + 0.010*\"say\" + 0.006*\"chinese\" + 0.005*\"country\" + 0.005*\"pakistan\" + 0.004*\"trade\" + 0.003*\"indian\" + 0.003*\"border\" + 0.003*\"party\"'),\n",
+              " (5,\n",
+              "  '0.019*\"say\" + 0.012*\"student\" + 0.007*\"school\" + 0.006*\"education\" + 0.005*\"college\" + 0.004*\"teacher\" + 0.004*\"government\" + 0.004*\"work\" + 0.004*\"state\" + 0.003*\"sushant\"'),\n",
+              " (6,\n",
+              "  '0.012*\"ipl\" + 0.010*\"team\" + 0.010*\"say\" + 0.008*\"play\" + 0.007*\"csk\" + 0.007*\"player\" + 0.007*\"year\" + 0.007*\"run\" + 0.006*\"match\" + 0.006*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.017*\"exam\" + 0.015*\"candidate\" + 0.014*\"say\" + 0.010*\"examination\" + 0.008*\"september\" + 0.007*\"student\" + 0.005*\"question\" + 0.005*\"paper\" + 0.005*\"test\" + 0.005*\"online\"'),\n",
+              " (8,\n",
+              "  '0.009*\"actor\" + 0.009*\"say\" + 0.009*\"film\" + 0.007*\"write\" + 0.007*\"people\" + 0.005*\"share\" + 0.005*\"post\" + 0.005*\"see\" + 0.005*\"time\" + 0.005*\"day\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 27
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "zMVIO0iz8ZBf",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 377
+        },
+        "outputId": "20c115e5-c870-4774-d1a4-e203ff1d6f47"
+      },
+      "source": [
+        "\n",
+        "ldamodel10 = LdaModel(corpus=corpus, num_topics=10, id2word=dictionary, passes=150, random_state=0)\n",
+        "topics10=ldamodel10.print_topics(num_words=10)\n",
+        "topics10"
+      ],
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0,\n",
+              "  '0.009*\"say\" + 0.005*\"woman\" + 0.004*\"case\" + 0.004*\"charge\" + 0.003*\"drug\" + 0.003*\"ncb\" + 0.003*\"year\" + 0.003*\"india\" + 0.003*\"abe\" + 0.003*\"die\"'),\n",
+              " (1,\n",
+              "  '0.019*\"say\" + 0.007*\"vaccine\" + 0.006*\"year\" + 0.006*\"case\" + 0.006*\"student\" + 0.006*\"exam\" + 0.006*\"state\" + 0.005*\"candidate\" + 0.005*\"government\" + 0.005*\"question\"'),\n",
+              " (2,\n",
+              "  '0.013*\"say\" + 0.006*\"government\" + 0.005*\"state\" + 0.005*\"trump\" + 0.004*\"india\" + 0.004*\"year\" + 0.003*\"people\" + 0.003*\"need\" + 0.003*\"court\" + 0.003*\"election\"'),\n",
+              " (3,\n",
+              "  '0.011*\"people\" + 0.010*\"say\" + 0.008*\"film_industry\" + 0.006*\"industry\" + 0.004*\"speak\" + 0.004*\"kangana\" + 0.004*\"work\" + 0.004*\"taiwan\" + 0.004*\"come\" + 0.004*\"drug\"'),\n",
+              " (4,\n",
+              "  '0.017*\"india\" + 0.013*\"say\" + 0.013*\"china\" + 0.006*\"country\" + 0.006*\"government\" + 0.005*\"chinese\" + 0.004*\"pakistan\" + 0.004*\"world\" + 0.004*\"year\" + 0.003*\"indian\"'),\n",
+              " (5,\n",
+              "  '0.016*\"say\" + 0.008*\"student\" + 0.008*\"school\" + 0.006*\"state\" + 0.006*\"government\" + 0.005*\"education\" + 0.004*\"teacher\" + 0.004*\"college\" + 0.004*\"work\" + 0.004*\"report\"'),\n",
+              " (6,\n",
+              "  '0.011*\"ipl\" + 0.011*\"say\" + 0.009*\"team\" + 0.008*\"play\" + 0.007*\"year\" + 0.007*\"player\" + 0.007*\"csk\" + 0.006*\"run\" + 0.006*\"match\" + 0.006*\"mumbai_indians\"'),\n",
+              " (7,\n",
+              "  '0.011*\"say\" + 0.009*\"actor\" + 0.008*\"time\" + 0.006*\"film\" + 0.006*\"people\" + 0.004*\"write\" + 0.004*\"want\" + 0.004*\"story\" + 0.004*\"share\" + 0.004*\"tell\"'),\n",
+              " (8,\n",
+              "  '0.009*\"say\" + 0.006*\"write\" + 0.006*\"india\" + 0.005*\"people\" + 0.005*\"day\" + 0.005*\"post\" + 0.004*\"see\" + 0.004*\"film\" + 0.004*\"video\" + 0.004*\"actor\"'),\n",
+              " (9,\n",
+              "  '0.011*\"september\" + 0.009*\"examination\" + 0.009*\"candidate\" + 0.008*\"exam\" + 0.007*\"result\" + 0.007*\"jee_main\" + 0.006*\"online\" + 0.005*\"admit_card\" + 0.005*\"read\" + 0.005*\"paper\"')]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 28
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_VyeZSvB8bcP",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "# Model 7 seems sensible\n",
+        "# lets name the topics\n",
+        "topics={0:'cricket', 1:'education', 2:'international', 3:'economy', 4:'politics', \n",
+        "        5:'health', 6:'policies', 7:'bollywood'}"
+      ],
+      "execution_count": 29,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "BjG2IlFo8eFj",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "# Reading the test data\n",
+        "test=open('/content/test_news.txt', 'r').read()"
+      ],
+      "execution_count": 30,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "G2zdwtTLAHjt",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "49e28add-c67f-426f-8db0-b06272030c15"
+      },
+      "source": [
+        "\n",
+        "cleaned_test=[]\n",
+        "for i in test.split('\\n'):\n",
+        "    sent=nlp(clean(i))\n",
+        "    cleaned_test.append(sent)\n",
+        "print(len(cleaned_test))"
+      ],
+      "execution_count": 31,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "243\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "OjLmrVLoALTN",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "656d46ee-db34-480a-b81f-4e234b6206c8"
+      },
+      "source": [
+        "len(cleaned_test[0])"
+      ],
+      "execution_count": 32,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "130"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 32
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "exHbUkLlAOnw",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 54
+        },
+        "outputId": "c7a29cbf-5b5c-46e9-bf59-3bfb4e09f52a"
+      },
+      "source": [
+        "cleaned_test[0]"
+      ],
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "youtube has rolled out new short form video creator called youtube shorts india and this has been done give competition chinese video sharing application tiktok per report the verge shorts will allow people make videos and can set music well music for these videos will available through product music picker feature the picker currently has tracks and working with music artists labels and publishers make more their content available continue expanding our catalogue youtube spokesperson told the verge trying attract the maximum number people there will new create icon spot and will appear prominently the app the create icon has rolled out with the shorts beta android and there are plans bring the icon ios devices soon not known when shorts will appear for other countries such the united states"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 33
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "UPjgqmgoAR7X",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "\n",
+        "article_te, texts_te = [], []\n",
+        "for doc in cleaned_test:\n",
+        "    for w in doc:\n",
+        "        # if it's not a stop word or punctuation mark, add it to our article\n",
+        "        if not w.is_stop and not w.is_punct and not w.like_num:\n",
+        "            # we add the lematized version of the word\n",
+        "            article_te.append(w.lemma_)\n",
+        "    texts_te.append(article_te)\n",
+        "    article_te=[]"
+      ],
+      "execution_count": 34,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1XfRGGBmAVAa",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "texts_te = [bigram[line] for line in texts_te]"
+      ],
+      "execution_count": 35,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "N-H7GnPjAZ6-",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "055314ff-c4de-4327-ef51-4e67f55ac990"
+      },
+      "source": [
+        "len(texts_te)"
+      ],
+      "execution_count": 36,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "243"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 36
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "DfucArABAdC7",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        },
+        "outputId": "7de564a4-ad1c-44a4-c366-93940dc366d3"
+      },
+      "source": [
+        "texts_te[0]"
+      ],
+      "execution_count": 37,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['youtube',\n",
+              " 'roll',\n",
+              " 'new',\n",
+              " 'short',\n",
+              " 'form',\n",
+              " 'video',\n",
+              " 'creator',\n",
+              " 'call',\n",
+              " 'youtube',\n",
+              " 'shorts',\n",
+              " 'india',\n",
+              " 'competition',\n",
+              " 'chinese',\n",
+              " 'video',\n",
+              " 'sharing',\n",
+              " 'application',\n",
+              " 'tiktok',\n",
+              " 'report',\n",
+              " 'verge',\n",
+              " 'short',\n",
+              " 'allow',\n",
+              " 'people',\n",
+              " 'video',\n",
+              " 'set',\n",
+              " 'music',\n",
+              " 'music',\n",
+              " 'video',\n",
+              " 'available',\n",
+              " 'product',\n",
+              " 'music',\n",
+              " 'picker',\n",
+              " 'feature',\n",
+              " 'picker',\n",
+              " 'currently',\n",
+              " 'track',\n",
+              " 'work',\n",
+              " 'music',\n",
+              " 'artist',\n",
+              " 'label',\n",
+              " 'publisher',\n",
+              " 'content',\n",
+              " 'available',\n",
+              " 'continue',\n",
+              " 'expand',\n",
+              " 'catalogue',\n",
+              " 'youtube',\n",
+              " 'spokesperson',\n",
+              " 'tell',\n",
+              " 'verge',\n",
+              " 'try',\n",
+              " 'attract',\n",
+              " 'maximum_number',\n",
+              " 'people',\n",
+              " 'new',\n",
+              " 'create',\n",
+              " 'icon',\n",
+              " 'spot',\n",
+              " 'appear',\n",
+              " 'prominently',\n",
+              " 'app',\n",
+              " 'create',\n",
+              " 'icon',\n",
+              " 'roll',\n",
+              " 'short',\n",
+              " 'beta',\n",
+              " 'android',\n",
+              " 'plan',\n",
+              " 'bring',\n",
+              " 'icon',\n",
+              " 'ios',\n",
+              " 'device',\n",
+              " 'soon',\n",
+              " 'know',\n",
+              " 'short',\n",
+              " 'appear',\n",
+              " 'country',\n",
+              " 'united_states']"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 37
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "m6-XNEYBAgBm",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "corpus_te = [dictionary.doc2bow(text) for text in texts_te]"
+      ],
+      "execution_count": 38,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Syzfgr23AjyD",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 867
+        },
+        "outputId": "50bb12e6-0eb2-4a0a-ba55-a5c048b9d5cb"
+      },
+      "source": [
+        "corpus_te[0]\n"
+      ],
+      "execution_count": 39,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(90, 1),\n",
+              " (101, 1),\n",
+              " (106, 1),\n",
+              " (109, 2),\n",
+              " (133, 1),\n",
+              " (163, 1),\n",
+              " (212, 2),\n",
+              " (235, 1),\n",
+              " (271, 1),\n",
+              " (388, 1),\n",
+              " (399, 1),\n",
+              " (535, 1),\n",
+              " (588, 2),\n",
+              " (613, 1),\n",
+              " (853, 1),\n",
+              " (965, 1),\n",
+              " (1006, 1),\n",
+              " (1064, 1),\n",
+              " (1165, 1),\n",
+              " (1204, 1),\n",
+              " (1276, 2),\n",
+              " (1286, 1),\n",
+              " (1595, 1),\n",
+              " (1611, 1),\n",
+              " (1766, 1),\n",
+              " (1791, 1),\n",
+              " (1838, 4),\n",
+              " (1928, 1),\n",
+              " (1949, 1),\n",
+              " (1993, 1),\n",
+              " (2012, 3),\n",
+              " (2098, 1),\n",
+              " (2107, 4),\n",
+              " (2143, 2),\n",
+              " (2288, 1),\n",
+              " (2416, 4),\n",
+              " (2713, 1),\n",
+              " (3116, 1),\n",
+              " (3173, 1),\n",
+              " (3308, 1),\n",
+              " (3818, 1),\n",
+              " (3912, 1),\n",
+              " (3970, 1),\n",
+              " (4195, 1),\n",
+              " (4207, 1),\n",
+              " (4815, 2),\n",
+              " (4874, 1),\n",
+              " (7534, 2),\n",
+              " (8556, 3),\n",
+              " (8893, 1)]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 39
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "TbD-4VCzAqyP",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 102
+        },
+        "outputId": "4f85534a-0d89-412e-991b-ebb82eddaff5"
+      },
+      "source": [
+        "\n",
+        "ldamodel7.get_document_topics(corpus_te[0])"
+      ],
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(1, 0.1334802),\n",
+              " (2, 0.27024487),\n",
+              " (3, 0.19832298),\n",
+              " (4, 0.22398679),\n",
+              " (7, 0.16867429)]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 40
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "U933T7DGAvcF",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "2844b155-b270-47ec-a2cc-92c195fa62f2"
+      },
+      "source": [
+        "\n",
+        "ldamodel7.get_document_topics(corpus_te[0])[2][1]"
+      ],
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0.19833496"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 41
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "aiFM74tOAjor",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 119
+        },
+        "outputId": "0cc73cfb-e167-4c44-9f25-baa8ff37695c"
+      },
+      "source": [
+        "ldamodel7.get_document_topics(corpus_te[2])"
+      ],
+      "execution_count": 42,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(1, 0.12819993),\n",
+              " (2, 0.55911577),\n",
+              " (3, 0.042266242),\n",
+              " (4, 0.048972808),\n",
+              " (5, 0.15842657),\n",
+              " (6, 0.060437206)]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 42
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "jEhUez97Av40",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 80
+        },
+        "outputId": "bdf65a24-d01c-41cd-bdb6-a255db6fc929"
+      },
+      "source": [
+        "final_df=pd.DataFrame([['',0,0,0,0,0,0,0,0]], columns=['text','cricket','education','international','economy',\n",
+        "                                                  'politics','health','policies','bollywood'])\n",
+        "final_df"
+      ],
+      "execution_count": 43,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>text</th>\n",
+              "      <th>cricket</th>\n",
+              "      <th>education</th>\n",
+              "      <th>international</th>\n",
+              "      <th>economy</th>\n",
+              "      <th>politics</th>\n",
+              "      <th>health</th>\n",
+              "      <th>policies</th>\n",
+              "      <th>bollywood</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td></td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "  text  cricket  education  ...  health  policies  bollywood\n",
+              "0             0          0  ...       0         0          0\n",
+              "\n",
+              "[1 rows x 9 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 43
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "pGw3nzz0Af-r",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "for i in range(len(cleaned_test)):\n",
+        "    result_dict={'text':'', 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}\n",
+        "    result_dict['text']=str(cleaned_test[i])\n",
+        "    for j in ldamodel7.get_document_topics(corpus_te[i]):\n",
+        "        k=j[0]\n",
+        "        result_dict[k]=j[1]\n",
+        "#     print(result_dict)\n",
+        "    temp=pd.DataFrame([result_dict.values()], columns=['text','cricket','education','international','economy',\n",
+        "                                                  'politics','health','policies','bollywood'])\n",
+        "    final_df=pd.concat([final_df, temp], axis=0)"
+      ],
+      "execution_count": 44,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2NCR1qDvA8q5",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "final_df.reset_index(inplace=True)"
+      ],
+      "execution_count": 45,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "y01n7GaPA812",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "final_df=final_df.drop(index=0).reset_index()"
+      ],
+      "execution_count": 46,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1JFuqXyIA9Cp",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "final_df.drop(['level_0', 'index'],axis=1, inplace=True)"
+      ],
+      "execution_count": 47,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "B9v8w8nRA9J9",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 289
+        },
+        "outputId": "82f09b92-0e82-463e-be68-29ad1ed0eb7e"
+      },
+      "source": [
+        "final_df.head()"
+      ],
+      "execution_count": 48,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>text</th>\n",
+              "      <th>cricket</th>\n",
+              "      <th>education</th>\n",
+              "      <th>international</th>\n",
+              "      <th>economy</th>\n",
+              "      <th>politics</th>\n",
+              "      <th>health</th>\n",
+              "      <th>policies</th>\n",
+              "      <th>bollywood</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>youtube has rolled out new short form video cr...</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.133504</td>\n",
+              "      <td>0.270235</td>\n",
+              "      <td>0.198328</td>\n",
+              "      <td>0.223981</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.168662</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>order implement the national education policy ...</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.267189</td>\n",
+              "      <td>0.486223</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.238958</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>prime minister narendra modi will address conc...</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.127671</td>\n",
+              "      <td>0.559391</td>\n",
+              "      <td>0.042519</td>\n",
+              "      <td>0.049078</td>\n",
+              "      <td>0.158338</td>\n",
+              "      <td>0.060421</td>\n",
+              "      <td>0.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>with the state government decision stay admiss...</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.416130</td>\n",
+              "      <td>0.430494</td>\n",
+              "      <td>0.013800</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.044926</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.092112</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>gareth bale completed his return tottenham fro...</td>\n",
+              "      <td>0.101778</td>\n",
+              "      <td>0.082336</td>\n",
+              "      <td>0.074853</td>\n",
+              "      <td>0.047246</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.054455</td>\n",
+              "      <td>0.591177</td>\n",
+              "      <td>0.046716</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                                                text  ...  bollywood\n",
+              "0  youtube has rolled out new short form video cr...  ...   0.168662\n",
+              "1  order implement the national education policy ...  ...   0.000000\n",
+              "2  prime minister narendra modi will address conc...  ...   0.000000\n",
+              "3  with the state government decision stay admiss...  ...   0.092112\n",
+              "4  gareth bale completed his return tottenham fro...  ...   0.046716\n",
+              "\n",
+              "[5 rows x 9 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 48
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Yg_79aJEA9S-",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 54
+        },
+        "outputId": "31e4b3f0-8b4d-4c45-d338-c8d0d0eb4591"
+      },
+      "source": [
+        "# lets recheck whether everything in our result df is in place or not\n",
+        "cleaned_test[5]\n"
+      ],
+      "execution_count": 49,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "for the first time history the ipl will see participation american cricketer after kolkata knight riders signed ali khan fast bowler from the usa report espncricinfo states will replace the injured harry gurney who pulled out the ipl and set undergo shoulder injury also follow ipl full coveragekhan was part the trinbago knight riders squad which remained unbeaten route their cpl title win the tournament khan picked eight wickets from eight matches with economy rate per reports khan was kkr radar last season well but deal could worked out also read ipl virat kohli goes ballistic nets admits shoulders are sore khan rose prominence during the global canada where caught the attention star all rounder dwayne bravo who brought the youngster the cpl that year khan picked wickets from matches for guyana amazon warriors the second most fast bowler the season bravo one his instagram stories posted video with khan brendon mccullum and few more inside plan with the caption next stop dubai also read arguably the best bowler the world david hussey names player watch out forkhan was selected usa squad for the first time for the auty cup and icc wcl division four los angeles his cpl debut khan dismissed kumar sangakkara with his first delivery back december interview ali who had registered for the ipl auction had said getting picked the ipl would like dream come true also watch ipl important for players bio bubble says gautam gambhir first all great honour the only usa player the draft had told sportstar was the auction last year but wasn picked which was tough thought chances were pretty good this year get picked something bonus since started playing seriously the ipl has been the one targeted dream come true"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 49
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-WHGagULA9YZ",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 119
+        },
+        "outputId": "5039aed0-2888-4d02-99de-f0ec585a8493"
+      },
+      "source": [
+        "\n",
+        "ldamodel7.get_document_topics(corpus_te[5])"
+      ],
+      "execution_count": 50,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[(0, 0.024196455),\n",
+              " (1, 0.10521444),\n",
+              " (2, 0.0354626),\n",
+              " (4, 0.043610495),\n",
+              " (6, 0.6884763),\n",
+              " (7, 0.10149349)]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 50
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "g6xRH1qlA9ie",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 97
+        },
+        "outputId": "7c2d4183-9d61-46ae-8cea-c49e75f2cbc9"
+      },
+      "source": [
+        "final_df.iloc[[3]]"
+      ],
+      "execution_count": 54,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>text</th>\n",
+              "      <th>cricket</th>\n",
+              "      <th>education</th>\n",
+              "      <th>international</th>\n",
+              "      <th>economy</th>\n",
+              "      <th>politics</th>\n",
+              "      <th>health</th>\n",
+              "      <th>policies</th>\n",
+              "      <th>bollywood</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>with the state government decision stay admiss...</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.41613</td>\n",
+              "      <td>0.430494</td>\n",
+              "      <td>0.0138</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.044926</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>0.092112</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                                                text  ...  bollywood\n",
+              "3  with the state government decision stay admiss...  ...   0.092112\n",
+              "\n",
+              "[1 rows x 9 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 54
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "2uimnQAKKBYR",
+        "colab_type": "text"
+      },
+      "source": [
+        "#EOF Results looks perfect"
+      ]
+    }
+  ]
+}
